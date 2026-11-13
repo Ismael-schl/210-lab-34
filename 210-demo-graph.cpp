@@ -1,6 +1,8 @@
 //Lab 34 | COMSC 210 | Ismael Hadi
 #include <iostream>
 #include <vector>
+#include <stack>
+#include <queue>
 using namespace std;
 
 const int SIZE = 7;
@@ -44,13 +46,65 @@ public:
             cout << endl;
         }
     }
+
+    // Depth-first search (iterative, stack-based) starting from vertex start
+    void DFS(int start) {
+        vector<bool> visited(adjList.size(), false);
+        stack<int> s;
+
+        cout << "DFS starting from vertex " << start << ":" << endl;
+        s.push(start);
+
+        while (!s.empty()) {
+            int v = s.top();
+            s.pop();
+
+            // a vertex can be pushed more than once, so skip it if already visited
+            if (visited[v])
+                continue;
+
+            visited[v] = true;
+            cout << v << " ";
+
+            // push every unvisited neighbor; the last one pushed is explored first
+            for (Pair neighbor : adjList[v])
+                if (!visited[neighbor.first])
+                    s.push(neighbor.first);
+        }
+        cout << endl;
+    }
+
+    // Breadth-first search (queue-based) starting from vertex start
+    void BFS(int start) {
+        vector<bool> visited(adjList.size(), false);
+        queue<int> q;
+
+        cout << "BFS starting from vertex " << start << ":" << endl;
+        visited[start] = true;
+        q.push(start);
+
+        while (!q.empty()) {
+            int v = q.front();
+            q.pop();
+            cout << v << " ";
+
+            // mark neighbors visited when enqueued so each vertex enters the queue once
+            for (Pair neighbor : adjList[v]) {
+                if (!visited[neighbor.first]) {
+                    visited[neighbor.first] = true;
+                    q.push(neighbor.first);
+                }
+            }
+        }
+        cout << endl;
+    }
 };
 
 int main() {
     // Creates a vector of graph edges/weights
     vector<Edge> edges = {
         // (x, y, w) —> edge from x to y having weight w
-        {0,1,12},{0,2,8},{0,3,21},{2,3,6},{2,6,2},{5,6,6},{4,5,9},{2,4,4},{2,5,5}
+        {0,1,12},{0,2,8},{0,3,21},{2,3,6},{2,6,2},{5,6,6},{4,5,9},{2,4,4},{2,5,5},
     };
 
     // Creates graph
@@ -58,6 +112,10 @@ int main() {
 
     // Prints adjacency list representation of graph
     graph.printGraph();
+    graph.BFS(0);
+    graph.DFS(0);
+
+
 
     return 0;
 }

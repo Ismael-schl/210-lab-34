@@ -1,5 +1,5 @@
 //Lab 34 | COMSC 210 | Ismael Hadi
-// Step 4: Global airline route network with shortest paths (Dijkstra)
+// Step 5: Global airline route network with shortest paths and a minimum spanning tree
 #include <iostream>
 #include <vector>
 #include <stack>
@@ -135,6 +135,45 @@ public:
                     dist[v] = dist[u] + weight;
                     parent[v] = u;
                     pq.push(make_pair(dist[v], v));
+                }
+            }
+        }
+    }
+
+    // Prim's algorithm: builds a minimum spanning tree of the part of the graph
+    // reachable from start. parent[v] is the vertex v attaches to in the tree
+    // (-1 for start and for vertices that were never reached), and key[v] is the
+    // weight of that edge.
+    void primMST(int start, vector<int> &parent, vector<int> &key) {
+        vector<bool> inTree(adjList.size(), false);
+        key.assign(adjList.size(), INT_MAX);
+        parent.assign(adjList.size(), -1);
+
+        // min-heap of (edge weight, vertex) so the cheapest connecting edge comes out first
+        priority_queue<Pair, vector<Pair>, greater<Pair>> pq;
+
+        key[start] = 0;
+        pq.push(make_pair(0, start));
+
+        while (!pq.empty()) {
+            int u = pq.top().second;
+            pq.pop();
+
+            // skip outdated heap entries for vertices already in the tree
+            if (inTree[u])
+                continue;
+
+            inTree[u] = true;
+
+            // offer every edge from u to a vertex that is not in the tree yet
+            for (Pair edge : adjList[u]) {
+                int v = edge.first;
+                int weight = edge.second;
+
+                if (!inTree[v] && weight < key[v]) {
+                    key[v] = weight;
+                    parent[v] = u;
+                    pq.push(make_pair(weight, v));
                 }
             }
         }
@@ -307,6 +346,30 @@ public:
             cout << "]" << endl;
         }
     }
+
+    // Prim's MST: the cheapest set of routes (fewest total flight hours)
+    // that still connects every airport reachable from the start
+    void backboneNetwork(int start) {
+        vector<int> parent, key;
+        routes.primMST(start, parent, key);
+
+        cout << "Backbone Route Network (Minimum Spanning Tree) from " << label(start) << endl;
+        cout << "Purpose: Keeping every airport connected with the fewest total flight hours" << endl;
+        cout << "========================================" << endl;
+
+        int totalHours = 0;
+        int routeCount = 0;
+        for (int v = 0; v < SIZE; v++) {
+            if (parent[v] == -1)
+                continue;   // the start airport, or a closed airport that was never reached
+
+            cout << "Route from " << code[v] << " to " << code[parent[v]]
+                 << " with flight time: " << key[v] << " hrs" << endl;
+            totalHours += key[v];
+            routeCount++;
+        }
+        cout << "Total: " << routeCount << " routes, " << totalHours << " hrs" << endl;
+    }
 };
 
 int main() {
@@ -328,6 +391,8 @@ int main() {
     airline.fewestStops(0);
     cout << endl;
     airline.fastestRoutes(0);
+    cout << endl;
+    airline.backboneNetwork(0);
 
     return 0;
 }

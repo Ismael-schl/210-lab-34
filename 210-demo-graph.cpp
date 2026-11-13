@@ -5,7 +5,7 @@
 #include <queue>
 using namespace std;
 
-const int SIZE = 7;
+const int SIZE = 13;
 
 struct Edge {
     int src, dest, weight;
@@ -104,7 +104,8 @@ int main() {
     // Creates a vector of graph edges/weights
     vector<Edge> edges = {
         // (x, y, w) —> edge from x to y having weight w
-        {0,1,12},{0,2,8},{0,3,21},{2,3,6},{2,6,2},{5,6,6},{4,5,9},{2,4,4},{2,5,5},
+        {0,1,15},{0,2,5},{0,3,11},{2,3,7},{2,5,8},{7,3,4},
+        {5,11,9},{2,7,6},{1,9,2},{1,10,7},{3,8,6},{10,12,5}
     };
 
     // Creates graph

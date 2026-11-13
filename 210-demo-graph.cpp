@@ -384,6 +384,7 @@ int main() {
     // Creates the airline network on top of the graph
     AirlineNetwork airline(edges);
 
+
     airline.printRouteMap();
     cout << endl;
     airline.exploreItineraries(0);   // vertex 0 = SFO hub
@@ -393,6 +394,15 @@ int main() {
     airline.fastestRoutes(0);
     cout << endl;
     airline.backboneNetwork(0);
+    //Menu
+    int sel = 1000;
+    cout << "Airline Options Menu: " << endl << "[1] Display Route Map" << endl
+    << "[2] Explore Itineraries " << endl << "[3] Find Fewest Stops "<<
+    endl << "[4] Display Fastest Routes" << endl << "[5] Explore network backbone " << 
+    "[0] Exit " << endl << "Enter your choice ";
+    while (sel != 0) {
+        if (cin.fail())
+    }
 
     return 0;
 }

@@ -1,5 +1,4 @@
 //Lab 34 | COMSC 210 | Ismael Hadi
-// Step 5: Global airline route network with shortest paths and a minimum spanning tree
 #include <iostream>
 #include <vector>
 #include <stack>
@@ -384,24 +383,44 @@ int main() {
     // Creates the airline network on top of the graph
     AirlineNetwork airline(edges);
 
-
-    airline.printRouteMap();
-    cout << endl;
-    airline.exploreItineraries(0);   // vertex 0 = SFO hub
-    cout << endl;
-    airline.fewestStops(0);
-    cout << endl;
-    airline.fastestRoutes(0);
-    cout << endl;
-    airline.backboneNetwork(0);
     //Menu
     int sel = 1000;
+    while (sel != 0) {
+        
     cout << "Airline Options Menu: " << endl << "[1] Display Route Map" << endl
     << "[2] Explore Itineraries " << endl << "[3] Find Fewest Stops "<<
     endl << "[4] Display Fastest Routes" << endl << "[5] Explore network backbone " << 
-    "[0] Exit " << endl << "Enter your choice ";
-    while (sel != 0) {
-        if (cin.fail())
+     endl << "[0] Exit " << endl << "Enter your choice ";
+    cin >> sel;
+    if (cin.fail()) {
+            cin.clear();
+            cin.ignore(11111, '\n');
+            cout << "Invalid input: must be a number from the menu" << endl;
+            sel = 1000;
+            continue;
+        }
+    switch (sel) {
+        case 1: 
+            airline.printRouteMap();
+            break;
+        case 2:
+            airline.exploreItineraries(0);
+            break;
+        case 3:
+            airline.fewestStops(0);
+            break;
+        case 4:
+            airline.fastestRoutes(0);
+            break;
+        case 5:
+            airline.backboneNetwork(0);
+            break;
+        case 0:
+            cout << "Goodbye!" << endl;
+            break;
+        default: 
+            cout << "Invalid choice. Must be a number from the menu." << endl;
+    }
     }
 
     return 0;

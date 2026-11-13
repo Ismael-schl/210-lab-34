@@ -1,10 +1,13 @@
 //Lab 34 | COMSC 210 | Ismael Hadi
-// Step 3: Global airline route network built on the weighted graph
+// Step 4: Global airline route network with shortest paths (Dijkstra)
 #include <iostream>
 #include <vector>
 #include <stack>
 #include <queue>
 #include <string>
+#include <climits>
+#include <functional>
+#include <algorithm>
 using namespace std;
 
 const int SIZE = 13;  // vertices 0 through 12
@@ -99,6 +102,42 @@ public:
             }
         }
         cout << endl;
+    }
+
+    // Dijkstra's algorithm: finds the shortest total weight from src to every vertex.
+    // dist[v] holds the shortest distance (INT_MAX if unreachable) and
+    // parent[v] holds the vertex before v on that shortest path (-1 if none).
+    void dijkstra(int src, vector<int> &dist, vector<int> &parent) {
+        dist.assign(adjList.size(), INT_MAX);
+        parent.assign(adjList.size(), -1);
+
+        // min-heap of (distance, vertex) so the closest unfinished vertex comes out first
+        priority_queue<Pair, vector<Pair>, greater<Pair>> pq;
+
+        dist[src] = 0;
+        pq.push(make_pair(0, src));
+
+        while (!pq.empty()) {
+            int d = pq.top().first;
+            int u = pq.top().second;
+            pq.pop();
+
+            // skip outdated heap entries; a shorter distance to u was already found
+            if (d > dist[u])
+                continue;
+
+            // relax every edge leaving u
+            for (Pair edge : adjList[u]) {
+                int v = edge.first;
+                int weight = edge.second;
+
+                if (dist[u] + weight < dist[v]) {
+                    dist[v] = dist[u] + weight;
+                    parent[v] = u;
+                    pq.push(make_pair(dist[v], v));
+                }
+            }
+        }
     }
 };
 
@@ -232,6 +271,42 @@ public:
             }
         }
     }
+
+    // Dijkstra: shortest total flight time from the start airport to every other airport
+    void fastestRoutes(int start) {
+        vector<int> hours, previous;
+        routes.dijkstra(start, hours, previous);
+
+        cout << "Fastest Routes (Dijkstra) from " << label(start) << endl;
+        cout << "Purpose: Finding the shortest total flight time to every city" << endl;
+        cout << "========================================" << endl;
+
+        for (int v = 0; v < SIZE; v++) {
+            if (!isServed(v))
+                continue;   // closed airport
+
+            cout << code[start] << " -> " << code[v] << " : ";
+            if (hours[v] == INT_MAX) {
+                cout << "unreachable" << endl;
+                continue;
+            }
+            cout << hours[v] << " hrs";
+
+            // rebuild the route by walking back through the previous airports
+            vector<int> path;
+            for (int at = v; at != -1; at = previous[at])
+                path.push_back(at);
+            reverse(path.begin(), path.end());
+
+            cout << "   [";
+            for (size_t i = 0; i < path.size(); i++) {
+                if (i > 0)
+                    cout << " -> ";
+                cout << code[path[i]];
+            }
+            cout << "]" << endl;
+        }
+    }
 };
 
 int main() {
@@ -251,6 +326,8 @@ int main() {
     airline.exploreItineraries(0);   // vertex 0 = SFO hub
     cout << endl;
     airline.fewestStops(0);
+    cout << endl;
+    airline.fastestRoutes(0);
 
     return 0;
 }
